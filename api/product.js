@@ -1,21 +1,28 @@
-const express = require("express");
-const router = express.Router();
+import { Router } from "express";
+import { generateImageFiles, generateImagesLinks } from "bimg";
 
-/**
- * GET product list.
- *
- * @return product list | empty.
- */
-router.get("/", async (req, res) => {
+const router = Router();
+
+router.post("/links-only/:prompt", async (req: any, res: any) => {
   try {
-    res.json({
-      status: 200,
-      message: "Get data has successfully",
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).send("Server error");
+    const { prompt } = req.params;
+    const imageLinks = await generateImagesLinks(prompt);
+    return res.status(200).send(imageLinks);
+  } catch (err: any) {
+    console.trace(err);
+    return res.status(500).send(err.message);
   }
 });
 
-module.exports = router;
+router.post("/:prompt", async (req: any, res: any) => {
+  try {
+    const { prompt } = req.params;
+    const images = await generateImageFiles(prompt);
+    return res.status(200).send(images);
+  } catch (err: any) {
+    console.trace(err);
+    return res.status(500).send(err.message);
+  }
+});
+
+export default router;
